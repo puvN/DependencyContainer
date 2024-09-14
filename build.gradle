@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    //id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = 'com.puvn'
@@ -21,7 +21,7 @@ test {
     useJUnitPlatform()
 }
 
-/*
+
 // Task to create a fat JAR (uber JAR)
 shadowJar {
     archiveClassifier.set('all') // Adds a classifier to differentiate the fat JAR
@@ -32,4 +32,4 @@ shadowJar {
 jar {
     enabled = false
 }
-build.dependsOn shadowJar*/
+build.dependsOn shadowJar

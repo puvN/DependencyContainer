@@ -8,20 +8,17 @@ import com.puvn.bean.container.exception.ContainerContextInitializerException;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
 /**
- * Prepares a beanMap based on provided package names. Scans packages and adds them into a map which will be used
+ * Prepares a classMap based on provided package names. Scans packages and adds them into a map which will be used
  * for the actual application context
  */
-public class ContainerContextInitializer {
+public class ContainerContextInitializer extends Context {
 
     private static final Logger LOGGER = Logger.getLogger(ContainerContextInitializer.class.getName());
-
-    private final Map<String, Class<?>> beanMap = new HashMap<>();
 
     public ContainerContextInitializer(String[] packageNames) {
         try {
@@ -33,7 +30,7 @@ public class ContainerContextInitializer {
     }
 
     public Map<String, Class<?>> getContext() {
-        return beanMap;
+        return this.classMap;
     }
 
     private void constructContext(String[] packageNames) throws IOException {
@@ -53,7 +50,7 @@ public class ContainerContextInitializer {
                         );
                     }
                     if (isAnnotatedWith(clazz, ServiceBean.class) || isAnnotatedWith(clazz, RepositoryBean.class)) {
-                        beanMap.put(clazz.getName(), clazz);
+                        classMap.put(clazz.getName(), clazz);
                     }
                 } catch (Throwable t) {
                     String errorMessage =

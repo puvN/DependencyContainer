@@ -23,10 +23,11 @@ class ContainerContextInitializerTest {
 
     @Test
     public void should_find_annotated_classes_in_correct_context() {
-        ContainerContextInitializer containerContextInitializer = new ContainerContextInitializer(CORRECT_CONTEXT_PACKAGES);
+        ContainerContextInitializer containerContextInitializer =
+                new ContainerContextInitializer(CORRECT_CONTEXT_PACKAGES);
         Map<String, Class<?>> context = containerContextInitializer.getContext();
         assertNotNull(context);
-        assertEquals(2, context.size());
+        assertEquals(4, context.size());
         Class<?> serviceClass = context.get("com.puvn.bean.container.context.TestService");
         assertNotNull(serviceClass);
         assertTrue(serviceClass.isAnnotationPresent(ServiceBean.class));

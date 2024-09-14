@@ -1,6 +1,7 @@
 package com.puvn.bean.container;
 
 import com.puvn.bean.container.annotation.BeanContainer;
+import com.puvn.bean.container.context.ContainerApplicationContext;
 import com.puvn.bean.container.context.ContainerContextInitializer;
 import com.puvn.bean.container.exception.BeanContainerApplicationException;
 import com.puvn.bean.container.exception.BeanContainerError;
@@ -14,10 +15,19 @@ public class BeanContainerApplication {
     }
 
     public BeanContainerApplication(Class<?> mainClass, String[] args) {
+        // 1. Main class validation
         validateMainClassAnnotation(mainClass);
+        // 2. Context construction based on provided package names
         String[] packageNames = getValidatedPackageNames(mainClass);
         ContainerContextInitializer containerContextInitializer = constructContext(packageNames);
         Map<String, Class<?>> constructedContext = containerContextInitializer.getContext();
+        // 3. Context initialization based on constructed context
+        ContainerApplicationContext containerApplicationContext = prepareContext(constructedContext);
+        Map<String, Object> applicationContext = containerApplicationContext.getInitializedContext();
+    }
+
+    private ContainerApplicationContext prepareContext(Map<String, Class<?>> constructedContext) {
+        return new ContainerApplicationContext(constructedContext);
     }
 
     private ContainerContextInitializer constructContext(String[] packageNames) {

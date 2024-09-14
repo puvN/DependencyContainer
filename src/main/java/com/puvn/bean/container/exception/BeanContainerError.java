@@ -9,7 +9,10 @@ public enum BeanContainerError {
 
     // Container Initializer Exceptions
     CLASS_LOADING_ERROR("Could not get classpath from classloader during packages scan"),
-    MULTIPLE_BEAN_ANNOTATION_ERROR("There is more than one annotation in a bean");
+    MULTIPLE_BEAN_ANNOTATION_ERROR("There is more than one annotation in a class"),
+
+    // ContainerApplicationContext Exceptions
+    BEAN_CREATION_ERROR("Could not create bean");
 
     BeanContainerError(final String errorMessage) {
         this.errorMessage = errorMessage;

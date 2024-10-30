@@ -4,8 +4,8 @@ import com.google.common.collect.ObjectArrays;
 import com.puvn.bean.container.annotation.RepositoryBean;
 import com.puvn.bean.container.annotation.ServiceBean;
 import com.puvn.bean.container.context.ContainerContextInitializer;
-import com.puvn.bean.container.exception.BeanContainerError;
-import com.puvn.bean.container.exception.ContainerContextInitializerException;
+import com.puvn.bean.container.exception.bean.BeanContainerError;
+import com.puvn.bean.container.exception.context.ContainerContextInitializerException;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;

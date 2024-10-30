@@ -3,12 +3,15 @@ package com.puvn.bean.container;
 import com.puvn.bean.container.annotation.BeanContainer;
 import com.puvn.bean.container.context.ContainerApplicationContext;
 import com.puvn.bean.container.context.ContainerContextInitializer;
-import com.puvn.bean.container.exception.BeanContainerApplicationException;
-import com.puvn.bean.container.exception.BeanContainerError;
+import com.puvn.bean.container.exception.bean.BeanContainerApplicationException;
+import com.puvn.bean.container.exception.bean.BeanContainerError;
+import com.puvn.bean.container.http.SimpleHttpServer;
 
 import java.util.Map;
 
 public class BeanContainerApplication {
+
+    private static final int HTTP_SERVER_PORT = 8080;
 
     public static void run(Class<?> mainClass, String[] args) {
         new BeanContainerApplication(mainClass, args);
@@ -21,7 +24,9 @@ public class BeanContainerApplication {
         String[] packageNames = getValidatedPackageNames(mainClass);
         ContainerContextInitializer containerContextInitializer = constructContext(packageNames);
         Map<String, Class<?>> constructedContext = containerContextInitializer.getContext();
-        // 3. Context initialization based on constructed context
+        // 3. Initialize http server if there were any controllers found
+        SimpleHttpServer.initialize(HTTP_SERVER_PORT, constructedContext);
+        // 4. Context initialization based on constructed context
         ContainerApplicationContext containerApplicationContext = prepareContext(constructedContext);
         Map<String, Object> applicationContext = containerApplicationContext.getInitializedContext();
     }

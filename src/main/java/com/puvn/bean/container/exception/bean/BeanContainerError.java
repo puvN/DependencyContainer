@@ -1,4 +1,4 @@
-package com.puvn.bean.container.exception;
+package com.puvn.bean.container.exception.bean;
 
 public enum BeanContainerError {
 

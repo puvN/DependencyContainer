@@ -2,8 +2,8 @@ package com.puvn.bean.container;
 
 import com.puvn.testing.application.AnnotatedTestingApplication;
 import com.puvn.testing.application.NoMainAnnotationTestingApplication;
-import com.puvn.bean.container.exception.BeanContainerApplicationException;
-import com.puvn.bean.container.exception.BeanContainerError;
+import com.puvn.bean.container.exception.bean.BeanContainerApplicationException;
+import com.puvn.bean.container.exception.bean.BeanContainerError;
 import com.puvn.testing.application.WildCardPackageTestingApplication;
 import org.junit.jupiter.api.Test;
 

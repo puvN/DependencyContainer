@@ -1,7 +1,7 @@
 package com.puvn.bean.container.context;
 
-import com.puvn.bean.container.exception.BeanContainerError;
-import com.puvn.bean.container.exception.ContainerApplicationContextException;
+import com.puvn.bean.container.exception.bean.BeanContainerError;
+import com.puvn.bean.container.exception.context.ContainerApplicationContextException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;

@@ -1,5 +1,6 @@
 package com.puvn.bean.container.http;
 
+import com.puvn.bean.container.config.PropertyConfigLoader;
 import com.puvn.bean.container.context.ContainerApplicationContext;
 import com.puvn.bean.container.exception.http.HttpServerInitializeException;
 import com.sun.net.httpserver.HttpExchange;
@@ -21,16 +22,23 @@ public class SimpleHttpServer {
 
     private final Map<String, Method> handlerMapping;
 
+    private static final int DEFAULT_HTTP_SERVER_PORT = 8080;
+
+    private static final String HTTP_SERVER_PORT_KEY = "http.server.port";
+
     private final Executor virtualExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
-    public static void initialize(int port, Map<String, Class<?>> context) {
+    public static void initialize(PropertyConfigLoader configLoader, Map<String, Class<?>> context) {
         Map<String, Method> handlerMapping = DispatcherHandler.handleControllers(context);
         if (handlerMapping.isEmpty()) {
             LOGGER.info("No HTTP Request mappings found, skipping server creation");
             return;
         }
         try {
-            new SimpleHttpServer(port, handlerMapping);
+            new SimpleHttpServer(
+                    configLoader.getIntPropertyOrDefault(HTTP_SERVER_PORT_KEY, DEFAULT_HTTP_SERVER_PORT),
+                    handlerMapping
+            );
         } catch (IOException e) {
             throw new HttpServerInitializeException(e);
         }

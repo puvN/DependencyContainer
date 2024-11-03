@@ -1,6 +1,7 @@
 package com.puvn.bean.container;
 
 import com.puvn.bean.container.annotation.BeanContainer;
+import com.puvn.bean.container.config.PropertyConfigLoader;
 import com.puvn.bean.container.context.ContainerApplicationContext;
 import com.puvn.bean.container.context.ContainerContextInitializer;
 import com.puvn.bean.container.exception.bean.BeanContainerApplicationException;
@@ -11,13 +12,13 @@ import java.util.Map;
 
 public class BeanContainerApplication {
 
-    private static final int HTTP_SERVER_PORT = 8080;
-
     public static void run(Class<?> mainClass, String[] args) {
         new BeanContainerApplication(mainClass, args);
     }
 
     public BeanContainerApplication(Class<?> mainClass, String[] args) {
+        // 0. Initialization
+        var configLoader = new PropertyConfigLoader();
         // 1. Main class validation
         validateMainClassAnnotation(mainClass);
         // 2. Context construction based on provided package names
@@ -25,7 +26,7 @@ public class BeanContainerApplication {
         ContainerContextInitializer containerContextInitializer = constructContext(packageNames);
         Map<String, Class<?>> constructedContext = containerContextInitializer.getContext();
         // 3. Initialize http server if there were any controllers found
-        SimpleHttpServer.initialize(HTTP_SERVER_PORT, constructedContext);
+        SimpleHttpServer.initialize(configLoader, constructedContext);
         // 4. Context initialization based on constructed context
         ContainerApplicationContext containerApplicationContext = prepareContext(constructedContext);
         Map<String, Object> applicationContext = containerApplicationContext.getInitializedContext();

@@ -1,6 +1,6 @@
 package com.puvn.bean.container;
 
-import com.puvn.testing.application.AnnotatedTestingApplication;
+import com.puvn.testing.application.NoPackagesTestingApplication;
 import com.puvn.testing.application.NoMainAnnotationTestingApplication;
 import com.puvn.bean.container.exception.bean.BeanContainerApplicationException;
 import com.puvn.bean.container.exception.bean.BeanContainerError;
@@ -22,7 +22,7 @@ class BeanContainerApplicationTest {
     @Test
     public void should_raise_exception_if_no_packages_in_the_main_annotation() {
         var exception = assertThrows(BeanContainerApplicationException.class,
-                () -> new BeanContainerApplication(AnnotatedTestingApplication.class, new String[0]));
+                () -> new BeanContainerApplication(NoPackagesTestingApplication.class, new String[0]));
         assertTrue(exception.getMessage().contains(BeanContainerError.NO_PACKAGES_SPECIFIED.errorMessage));
     }
 

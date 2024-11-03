@@ -1,14 +1,18 @@
 package com.puvn.bean.container.context;
 
-import com.google.common.reflect.ClassPath;
 import com.puvn.bean.container.annotation.ControllerBean;
 import com.puvn.bean.container.annotation.RepositoryBean;
 import com.puvn.bean.container.annotation.ServiceBean;
 import com.puvn.bean.container.exception.bean.BeanContainerError;
 import com.puvn.bean.container.exception.context.ContainerContextInitializerException;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -37,33 +41,56 @@ public class ContainerContextInitializer extends Context {
 
     private void constructContext(String[] packageNames) throws IOException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        ClassPath classPath = ClassPath.from(classLoader);
-        for (String pkg : packageNames) {
-            Set<ClassPath.ClassInfo> classesInPackage = classPath.getTopLevelClassesRecursive(pkg);
+        Set<Class<?>> annotatedClasses = new HashSet<>();
 
-            for (ClassPath.ClassInfo classInfo : classesInPackage) {
-                try {
-                    Class<?> clazz = classInfo.load();
-                    //TODO move multiple annotation checks into Annotation Util
-                    if (isAnnotatedWith(clazz, ServiceBean.class) && isAnnotatedWith(clazz, RepositoryBean.class)) {
-                        String errorMessage = String.format("Class %s has invalid definition", clazz.getName());
-                        LOGGER.severe(errorMessage);
-                        throw new ContainerContextInitializerException(
-                                BeanContainerError.MULTIPLE_BEAN_ANNOTATION_ERROR
-                        );
-                    }
-                    if (isAnnotatedWith(clazz, ServiceBean.class) || isAnnotatedWith(clazz, RepositoryBean.class)
-                            || isAnnotatedWith(clazz, ControllerBean.class)) {
-                        classMap.put(clazz.getName(), clazz);
-                    }
-                } catch (Throwable t) {
-                    String errorMessage =
-                            String.format("Error processing class %s: %s", classInfo.getName(), t.getMessage());
-                    LOGGER.severe(errorMessage);
-                    throw t;
+        for (String pkg : packageNames) {
+            String path = pkg.replace('.', '/');
+            Enumeration<URL> resources = classLoader.getResources(path);
+
+            while (resources.hasMoreElements()) {
+                URL resource = resources.nextElement();
+                File directory = new File(resource.getFile());
+
+                if (directory.exists() && directory.isDirectory()) {
+                    findClassesInDirectory(directory, pkg, annotatedClasses);
                 }
             }
         }
+
+        for (Class<?> clazz : annotatedClasses) {
+            checkAndAddToClassMap(clazz);
+        }
+    }
+
+    private void findClassesInDirectory(File directory, String packageName, Set<Class<?>> classes) {
+        for (File file : Objects.requireNonNull(directory.listFiles())) {
+            if (file.isDirectory()) {
+                findClassesInDirectory(file, packageName + "." + file.getName(), classes);
+            } else if (file.getName().endsWith(".class")) {
+                String className = packageName + '.' + file.getName().replace(".class", "");
+                try {
+                    Class<?> clazz = Class.forName(className);
+                    if (isAnnotatedWith(clazz, ServiceBean.class) ||
+                            isAnnotatedWith(clazz, RepositoryBean.class) ||
+                            isAnnotatedWith(clazz, ControllerBean.class)) {
+                        classes.add(clazz);
+                    }
+                } catch (ClassNotFoundException e) {
+                    LOGGER.warning("Could not load class " + className);
+                }
+            }
+        }
+    }
+
+    private void checkAndAddToClassMap(Class<?> clazz) throws ContainerContextInitializerException {
+        if (isAnnotatedWith(clazz, ServiceBean.class) && isAnnotatedWith(clazz, RepositoryBean.class)) {
+            String errorMessage = String.format("Class %s has invalid definition", clazz.getName());
+            LOGGER.severe(errorMessage);
+            throw new ContainerContextInitializerException(
+                    BeanContainerError.MULTIPLE_BEAN_ANNOTATION_ERROR
+            );
+        }
+        classMap.put(clazz.getName(), clazz);
     }
 
 }

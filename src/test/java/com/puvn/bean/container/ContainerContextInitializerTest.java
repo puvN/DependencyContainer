@@ -1,6 +1,5 @@
 package com.puvn.bean.container;
 
-import com.google.common.collect.ObjectArrays;
 import com.puvn.bean.container.annotation.RepositoryBean;
 import com.puvn.bean.container.annotation.ServiceBean;
 import com.puvn.bean.container.context.ContainerContextInitializer;
@@ -8,6 +7,7 @@ import com.puvn.bean.container.exception.bean.BeanContainerError;
 import com.puvn.bean.container.exception.context.ContainerContextInitializerException;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,10 +45,12 @@ class ContainerContextInitializerTest {
 
     @Test
     public void should_raise_an_exception_if_invalid_context_presents() {
+        var allPackages = Arrays.copyOf(CORRECT_CONTEXT_PACKAGES, CORRECT_CONTEXT_PACKAGES.length +
+                INVALID_CONTEXT_PACKAGES.length);
+        System.arraycopy(INVALID_CONTEXT_PACKAGES, 0, allPackages, INVALID_CONTEXT_PACKAGES.length,
+                INVALID_CONTEXT_PACKAGES.length);
         var exception = assertThrows(ContainerContextInitializerException.class,
-                () -> new ContainerContextInitializer(
-                        ObjectArrays.concat(CORRECT_CONTEXT_PACKAGES, INVALID_CONTEXT_PACKAGES, String.class)
-                )
+                () -> new ContainerContextInitializer(allPackages)
         );
         assertTrue(exception.getMessage().contains(BeanContainerError.MULTIPLE_BEAN_ANNOTATION_ERROR.errorMessage));
     }

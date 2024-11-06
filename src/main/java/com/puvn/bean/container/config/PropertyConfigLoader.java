@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PropertyConfigLoader {
+
     private static final Logger logger = Logger.getLogger(PropertyConfigLoader.class.getName());
 
     private static final String APPLICATION_PROPERTIES_FILENAME = "application.properties";
@@ -31,6 +32,10 @@ public class PropertyConfigLoader {
             logger.log(Level.SEVERE, "Error loading properties file: " +
                     PropertyConfigLoader.APPLICATION_PROPERTIES_FILENAME, e);
         }
+    }
+
+    public Properties getProperties() {
+        return properties;
     }
 
     public String getProperty(String key) {

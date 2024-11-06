@@ -71,7 +71,7 @@ public class SimpleHttpServer {
         if (method != null) {
             virtualExecutor.execute(() -> {
                 try {
-                    method.invoke(method.getDeclaringClass().newInstance(), exchange);
+                    method.invoke(method.getDeclaringClass().getConstructors()[0].newInstance(), exchange);
                 } catch (Exception e) {
                     LOGGER.severe(e.getMessage());
                 }

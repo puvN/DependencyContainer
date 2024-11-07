@@ -7,14 +7,18 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SimpleHttpServer {
+
+    private static SimpleHttpServer instance;
 
     private static final Logger LOGGER = Logger.getLogger(ContainerApplicationContext.class.getName());
 
@@ -24,7 +28,7 @@ public class SimpleHttpServer {
 
     private static final int DEFAULT_HTTP_SERVER_PORT = 8080;
 
-    private static final String HTTP_SERVER_PORT_KEY = "http.server.port";
+    public static final String HTTP_SERVER_PORT_KEY = "http.server.port";
 
     private final Executor virtualExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
@@ -35,12 +39,19 @@ public class SimpleHttpServer {
             return;
         }
         try {
-            new SimpleHttpServer(
+            instance = new SimpleHttpServer(
                     configLoader.getIntPropertyOrDefault(HTTP_SERVER_PORT_KEY, DEFAULT_HTTP_SERVER_PORT),
                     handlerMapping
             );
+            instance.start();
         } catch (IOException e) {
             throw new HttpServerInitializeException(e);
+        }
+    }
+
+    public static void destroy() {
+        if (instance != null) {
+            instance.stop();
         }
     }
 
@@ -54,16 +65,18 @@ public class SimpleHttpServer {
         });
 
         server.setExecutor(virtualExecutor);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
 
-    public void start() {
+    private void start() {
         server.start();
         LOGGER.info("Server started on port " + server.getAddress().getPort());
     }
 
-    public void stop() {
+    private void stop() {
+        LOGGER.info("Stopping http server... ");
         server.stop(0);
-        System.out.println("Server stopped.");
     }
 
     private void handleRequest(String path, HttpExchange exchange) {
@@ -82,7 +95,15 @@ public class SimpleHttpServer {
     }
 
     private void sendNotFoundResponse(HttpExchange exchange) {
-        // Handle 404 response here
+        String response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n";
+        try (exchange) {
+            exchange.sendResponseHeaders(404, response.length());
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error sending 404 response", e);
+        }
     }
 
 }

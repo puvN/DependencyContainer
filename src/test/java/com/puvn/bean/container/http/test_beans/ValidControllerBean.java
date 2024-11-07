@@ -9,4 +9,10 @@ public class ValidControllerBean {
     @RequestMapping("/root/var/entity")
     public void doPost() {}
 
+    @RequestMapping("/root/get/entity")
+    public void doGet() {}
+
+    @RequestMapping("/root/patch/entity")
+    public void doPatch() {}
+
 }

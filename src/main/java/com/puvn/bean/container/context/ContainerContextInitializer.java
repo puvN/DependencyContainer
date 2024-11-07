@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.puvn.bean.container.util.AnnotationUtil.isAnnotatedWith;
@@ -84,8 +85,7 @@ public class ContainerContextInitializer extends Context {
 
     private void checkAndAddToClassMap(Class<?> clazz) throws ContainerContextInitializerException {
         if (isAnnotatedWith(clazz, ServiceBean.class) && isAnnotatedWith(clazz, RepositoryBean.class)) {
-            String errorMessage = String.format("Class %s has invalid definition", clazz.getName());
-            LOGGER.severe(errorMessage);
+            LOGGER.log(Level.SEVERE, String.format("Class %s has invalid definition", clazz.getName()));
             throw new ContainerContextInitializerException(
                     BeanContainerError.MULTIPLE_BEAN_ANNOTATION_ERROR
             );

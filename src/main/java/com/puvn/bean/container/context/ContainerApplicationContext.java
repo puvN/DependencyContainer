@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ContainerApplicationContext extends Context {
@@ -32,8 +33,7 @@ public class ContainerApplicationContext extends Context {
                     try {
                         createBean(clazz);
                     } catch (Exception e) {
-                        String message = String.format("Error while instantiating bean: %s", className);
-                        LOGGER.severe(message);
+                        LOGGER.log(Level.SEVERE, String.format("Error while instantiating bean: %s", className));
                         throw new ContainerApplicationContextException(BeanContainerError.BEAN_CREATION_ERROR);
                     }
                 }

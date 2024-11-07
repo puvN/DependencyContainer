@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 public class PropertyConfigLoader {
 
-    private static final Logger logger = Logger.getLogger(PropertyConfigLoader.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PropertyConfigLoader.class.getName());
 
     private static final String APPLICATION_PROPERTIES_FILENAME = "application.properties";
 
@@ -22,14 +22,15 @@ public class PropertyConfigLoader {
         try (InputStream input = getClass().getClassLoader()
                 .getResourceAsStream(PropertyConfigLoader.APPLICATION_PROPERTIES_FILENAME)) {
             if (input == null) {
-                logger.log(Level.WARNING,
-                        "Configuration file \"{0}\" not found; using default settings.",
-                        PropertyConfigLoader.APPLICATION_PROPERTIES_FILENAME);
+                LOGGER.log(Level.WARNING,
+                        String.format("Configuration file %s not found; using default settings.",
+                                PropertyConfigLoader.APPLICATION_PROPERTIES_FILENAME)
+                );
                 return;
             }
             properties.load(input);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error loading properties file: " +
+            LOGGER.log(Level.SEVERE, "Error loading properties file: " +
                     PropertyConfigLoader.APPLICATION_PROPERTIES_FILENAME, e);
         }
     }
